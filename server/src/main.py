@@ -18,14 +18,18 @@ redoc_url = None if ENV != "dev" else "/redoc"
 
 app = FastAPI(docs_url=docs_url, redoc_url=redoc_url)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=CORS_ALLOWED_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=CORS_ALLOWED_ORIGINS,
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
-app.include_router(sensor_router, prefix="/api/v1/sensors", tags=["sensors"])
+# app.include_router(sensor_router, prefix="/api/v1/sensors", tags=["sensors"])
 
-app.mount("/", StaticFiles(directory="src/static", html=True), name="static")
+# app.mount("/", StaticFiles(directory="src/static", html=True), name="static")
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello, World!"}

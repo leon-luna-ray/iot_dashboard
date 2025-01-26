@@ -1,5 +1,3 @@
-# Use a multi-stage build to build the frontend and backend
-
 # Stage 1: Build the client
 FROM node:lts-alpine as client
 
@@ -31,11 +29,8 @@ RUN pip install --upgrade pip
 COPY server/requirements.txt ./
 COPY server/src/ ./src/
 
-# Copy the built client files from the client stage directly into the backend static folder
-COPY --from=client /app/dist /app/src/static
-
 RUN pip install -r requirements.txt
 
-EXPOSE 8080
+EXPOSE 9090
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "9090", "--reload"]
