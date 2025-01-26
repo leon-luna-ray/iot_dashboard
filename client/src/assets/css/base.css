@@ -1,6 +1,5 @@
-@import "tailwindcss";
-
-
-h1 {
-    @apply text-4xl font-bold;
+@layer base {
+    h1 {
+        @apply text-[2rem] font-bold;
+    }
 }

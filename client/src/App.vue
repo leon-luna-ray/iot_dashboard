@@ -1,9 +1,7 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
   <main>
-    <h1 class="text-[2rem]">IOT Dashboard</h1>
+    <div class="container">
+      <h1>IOT Dashboard</h1>
+    </div>
   </main>
 </template>
