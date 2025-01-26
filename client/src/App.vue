@@ -1,7 +1,10 @@
 <template>
+  <Header />
   <main>
-    <div class="container">
-      <h1>IOT Dashboard</h1>
-    </div>
+
   </main>
 </template>
+
+<script setup>
+import Header from '@/components/Header.vue'
+</script>
