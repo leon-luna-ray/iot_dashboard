@@ -1,0 +1,31 @@
+@utility container {
+    margin-inline: auto;
+    padding-inline: 2rem;
+    max-width: 1440px;
+}
+
+@layer utilities {
+    .border-red {
+        @apply border-2 border-red-500;
+    }
+
+    .border-green {
+        @apply border-2 border-green-500;
+    }
+
+    .border-blue {
+        @apply border-2 border-blue-500;
+    }
+
+    .flex-col-05 {
+        @apply flex flex-col gap-y-[0.5rem];
+    }
+
+    .flex-col-1 {
+        @apply flex flex-col gap-y-[1rem];
+    }
+
+    .flex-col-2 {
+        @apply flex flex-col gap-y-[2rem];
+    }
+}
