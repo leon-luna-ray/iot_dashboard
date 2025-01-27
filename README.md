@@ -11,8 +11,6 @@ Intended use case is an ARM based RapsberryPi.
 
 - Raspberry Pi
 - Go programming language installed
-- Node.js installed
-- PNPM installed
 - Git installed
 
 ## Setup
@@ -40,21 +38,6 @@ Build the Go application and place the binary in the desired directory:
 
 ```sh
 go build -o ~/Apps/iot_dashboard ./cmd
-```
-
-### 4. Build the frontend client
-If pnpm is not already installed, you can install it using npm:
-
-```sh
-npm install -g pnpm
-```
-
-Navigate to the client directory and build the Vue.js application using pnpm:
-
-```sh
-cd client
-pnpm install
-pnpm run build
 ```
 
 ### 4. Create a Systemd Service
