@@ -2,17 +2,26 @@
 package main
 
 import (
+	"embed"
+	"io/fs"
 	"io/ioutil"
 	"net/http"
-	"path/filepath"
 )
 
+//go:embed internal/static/dist/*
+var frontend embed.FS
+
 func main() {
-	fs := http.FileServer(http.Dir("../internal/static/dist"))
+	// Create a file system from the embedded files
+	staticFiles, err := fs.Sub(frontend, "internal/static/dist")
+	if err != nil {
+		panic(err)
+	}
+	fs := http.FileServer(http.FS(staticFiles))
 
 	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
-			http.ServeFile(w, r, filepath.Join("../internal/static/dist", "index.html"))
+			http.ServeFile(w, r, "internal/static/dist/index.html")
 			return
 		}
 		fs.ServeHTTP(w, r)
