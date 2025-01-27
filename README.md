@@ -13,7 +13,7 @@ Intended use case is an ARM based RapsberryPi.
 - Go programming language installed
 - Git installed
 
-## Setup Steps
+## Setup
 
 ### 1. Clone the Repository
 
@@ -46,6 +46,9 @@ Create a systemd service file to run the application on boot:
 
 ```sh
 sudo nano /etc/systemd/system/iot_dashboard.service
+```
+
+Add service updating your relative path:
 
 ```sh
 [Unit]
@@ -110,8 +113,8 @@ Use the following commands to manage the service:
   sudo systemctl enable iot_dashboard.service
   ```
 
-  - **Disable the service from starting on boot**:
-  ```sh
-  sudo systemctl disable iot_dashboard.service
-  ```
+- **Disable the service from starting on boot**:
+    ```sh
+    sudo systemctl disable iot_dashboard.service
+    ```
 
