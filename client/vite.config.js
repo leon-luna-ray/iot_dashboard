@@ -15,7 +15,7 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: '../server/internal/web/dist',
+    outDir: '../server/internal/static/dist',
     emptyOutDir: true,
   },
 })
