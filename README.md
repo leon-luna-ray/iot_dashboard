@@ -1,5 +1,5 @@
 # IoT Dashboard 🚧
-Go web server for running a home automation dashboard on a local network. (In development)
+Go web server for running a home automation dashboard on a local network (in development).
 Intended use case is an ARM based RapsberryPi.
 
 ## Technologies
