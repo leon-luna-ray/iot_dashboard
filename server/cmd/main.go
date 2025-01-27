@@ -18,11 +18,11 @@ func main() {
 		fs.ServeHTTP(w, r)
 	}))
 
-	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/api/v1/hello", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello, World!"))
 	})
 
-	http.HandleFunc("/posts", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/api/v1/posts", func(w http.ResponseWriter, r *http.Request) {
 		resp, err := http.Get("https://jsonplaceholder.typicode.com/posts")
 		if err != nil {
 			http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
