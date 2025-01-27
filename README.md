@@ -40,17 +40,17 @@ Build the Go application and place the binary in the desired directory:
 go build -o ~/Apps/iot_dashboard ./cmd
 ```
 
-### 4. Build the Frontend
+### 4. Build the frontend client
 If pnpm is not already installed, you can install it using npm:
 
 ```sh
 npm install -g pnpm
 ```
 
-Navigate to the frontend directory and build the Vue.js application using pnpm:
+Navigate to the client directory and build the Vue.js application using pnpm:
 
 ```sh
-cd frontend
+cd client
 pnpm install
 pnpm run build
 ```
@@ -124,12 +124,12 @@ cd server
 go build -o ~/Apps/iot_dashboard ./cmd
 ```
 
-### 3. Build the Frontend
+### 3. Build the client
 
-Navigate to the frontend directory and rebuild the Vue.js application using pnpm:
+Navigate to the client directory and rebuild the Vue.js application using pnpm:
 
 ```sh
-cd ../frontend
+cd ../client
 pnpm install
 pnpm run build
 ```
