@@ -11,6 +11,8 @@ Intended use case is an ARM based RapsberryPi.
 
 - Raspberry Pi
 - Go programming language installed
+- Node.js installed
+- Pnpm installed
 - Git installed
 
 ## Setup
@@ -32,7 +34,22 @@ If project does not already have a `go.mod` file, initialize Go modules:
 go mod init github.com/leon-luna-ray/iot_dashboard
 ```
 
-### 3. Build the Go Application
+### 3. Build the frontend client
+If pnpm is not already installed, you can install it using npm:
+
+```sh
+npm install -g pnpm
+```
+
+Navigate to the client directory and build the Vue.js application using pnpm:
+
+```sh
+cd client
+pnpm install
+pnpm run build
+```
+
+### 4. Build the Go Application
 
 Build the Go application and place the binary in the desired directory:
 
@@ -99,6 +116,15 @@ Navigate to your project directory and pull the latest changes from the main bra
 cd ~/iot_dashboard
 git pull origin main
 ```
+### 3. Build the frontend client
+
+Navigate to the client directory and rebuild the Vue.js application using pnpm:
+
+```sh
+cd ../client
+pnpm install
+pnpm run build
+```
 
 ### 2. Build the Go Application
 
@@ -107,16 +133,6 @@ Rebuild the Go application and place the binary in the `Apps` folder:
 ```sh
 cd server
 go build -o ~/Apps/iot_dashboard ./cmd
-```
-
-### 3. Build the client
-
-Navigate to the client directory and rebuild the Vue.js application using pnpm:
-
-```sh
-cd ../client
-pnpm install
-pnpm run build
 ```
 
 ### 4. Restart the Service
