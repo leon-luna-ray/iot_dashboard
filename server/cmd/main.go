@@ -2,6 +2,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"path/filepath"
 )
@@ -19,6 +20,24 @@ func main() {
 
 	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello, World!"))
+	})
+
+	http.HandleFunc("/posts", func(w http.ResponseWriter, r *http.Request) {
+		resp, err := http.Get("https://jsonplaceholder.typicode.com/posts")
+		if err != nil {
+			http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
+			return
+		}
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			http.Error(w, "Failed to read response body", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(body)
 	})
 
 	println(`
