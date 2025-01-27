@@ -40,6 +40,21 @@ Build the Go application and place the binary in the `Apps` folder:
 go build -o ~/Apps/iot_dashboard ./cmd
 ```
 
+### 4. Build the Frontend
+If pnpm is not already installed, you can install it using npm:
+
+```sh
+npm install -g pnpm
+```
+
+Navigate to the frontend directory and build the Vue.js application using pnpm:
+
+```sh
+cd frontend
+pnpm install
+pnpm run build
+```
+
 ### 4. Create a Systemd Service
 
 Create a systemd service file to run the application on boot:
