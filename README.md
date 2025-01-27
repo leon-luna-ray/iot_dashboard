@@ -57,7 +57,7 @@ Build the Go application and place the binary in the desired directory:
 go build -o ~/Apps/iot_dashboard ./cmd
 ```
 
-### 4. Create a Systemd Service
+### 5. Create a Systemd Service
 
 Create a systemd service file to run the application on boot:
 
@@ -85,7 +85,7 @@ WorkingDirectory=/home/user/Apps
 WantedBy=multi-user.target
 ```
 
-### 5. Reload Systemd and Enable the Service
+### 6. Reload Systemd and Enable the Service
 
 Reload systemd to recognize the new service:
 
@@ -94,7 +94,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable iot_dashboard.service
 ```
 
-### 6. Start the Service
+### 7. Start the Service
 
 Start the service:
 
@@ -116,7 +116,7 @@ Navigate to your project directory and pull the latest changes from the main bra
 cd ~/iot_dashboard
 git pull origin main
 ```
-### 3. Build the frontend client
+### 2. Build the frontend client
 
 Navigate to the client directory and rebuild the Vue.js application using pnpm:
 
@@ -126,7 +126,7 @@ pnpm install
 pnpm run build
 ```
 
-### 2. Build the Go Application
+### 3. Build the Go Application
 
 Rebuild the Go application and place the binary in the `Apps` folder:
 
