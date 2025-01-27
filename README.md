@@ -17,7 +17,7 @@ Intended use case is an ARM based RapsberryPi.
 
 ### 1. Clone the Repository
 
-Clone your Go application repository to your Raspberry Pi:
+Clone the repository to your Raspberry Pi:
 
 ```sh
 git clone https://github.com/leon-luna-ray/iot_dashboard.git
@@ -26,7 +26,7 @@ cd iot_dashboard/server
 
 ### 2. Initialize Go Modules (if needed)
 
-If your project does not already have a `go.mod` file, initialize Go modules:
+If project does not already have a `go.mod` file, initialize Go modules:
 
 ```sh
 go mod init github.com/leon-luna-ray/iot_dashboard
@@ -34,7 +34,7 @@ go mod init github.com/leon-luna-ray/iot_dashboard
 
 ### 3. Build the Go Application
 
-Build the Go application and place the binary in the `Apps` folder:
+Build the Go application and place the binary in the desired directory:
 
 ```sh
 go build -o ~/Apps/iot_dashboard ./cmd
