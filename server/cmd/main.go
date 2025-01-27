@@ -1,14 +1,24 @@
-// filepath: /Users/rayluna/code/projects/iot_dashboard/server/cmd/main.go
+// Main file for the server
 package main
 
 import (
-    "log"
-    "net/http"
-    "iot_dashboard/internal/router"
+	"net/http"
+	"path/filepath"
 )
 
 func main() {
-    r := router.SetupRouter()
-    log.Println("Server is running on http://localhost:9090")
-    log.Fatal(http.ListenAndServe(":9090", r))
+	fs := http.FileServer(http.Dir("../internal/static/dist"))
+
+	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			http.ServeFile(w, r, filepath.Join("../internal/static/dist", "index.html"))
+			return
+		}
+		fs.ServeHTTP(w, r)
+	}))
+
+	println(`
+    Server started at http://localhost:9090 📡
+    `)
+	http.ListenAndServe(":9090", nil)
 }

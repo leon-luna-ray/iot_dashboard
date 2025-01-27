@@ -1,9 +1,9 @@
 package handlers
 
 import (
-    "net/http"
+	"net/http"
 )
 
 func StaticHandler() http.Handler {
-    return http.FileServer(http.Dir("./internal/web/dist"))
+	return http.FileServer(http.Dir("../../internal/static/dist"))
 }
