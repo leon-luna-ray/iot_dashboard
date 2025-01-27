@@ -101,7 +101,56 @@ sudo systemctl start iot_dashboard.service
 sudo systemctl status iot_dashboard.service
 ```
 
-### 7. Managing the Service
+
+## Updates
+
+To update the application with the latest changes from the main branch, follow these steps:
+
+### 1. Pull the Latest Changes
+
+Navigate to your project directory and pull the latest changes from the main branch:
+
+```sh
+cd ~/iot_dashboard
+git pull origin main
+```
+
+### 2. Build the Go Application
+
+Rebuild the Go application and place the binary in the `Apps` folder:
+
+```sh
+cd server
+go build -o ~/Apps/iot_dashboard ./cmd
+```
+
+### 3. Build the Frontend
+
+Navigate to the frontend directory and rebuild the Vue.js application using pnpm:
+
+```sh
+cd ../frontend
+pnpm install
+pnpm run build
+```
+
+### 4. Restart the Service
+
+Restart the systemd service to apply the updates:
+
+```sh
+sudo systemctl restart iot_dashboard.service
+```
+
+### 5. Check the Service Status
+
+Ensure the service is running correctly:
+
+```sh
+sudo systemctl status iot_dashboard.service
+```
+
+## Management Commands
 
 Use the following commands to manage the service:
 
@@ -132,4 +181,3 @@ Use the following commands to manage the service:
     ```sh
     sudo systemctl disable iot_dashboard.service
     ```
-
