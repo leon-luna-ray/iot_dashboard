@@ -97,3 +97,5 @@ vendor/
 /build/
 
 dist/
+
+/server/iot_dashboard
