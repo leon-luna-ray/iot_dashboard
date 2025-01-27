@@ -110,10 +110,10 @@ To update the application with the latest changes from the main branch, follow t
 
 ### 1. Pull the Latest Changes
 
-Navigate to your project directory and pull the latest changes from the main branch:
+Navigate to the project directory and pull the latest changes from the main branch:
 
 ```sh
-cd ~/iot_dashboard
+cd ~/code/iot_dashboard
 git pull origin main
 ```
 ### 2. Build the frontend client
@@ -121,17 +121,17 @@ git pull origin main
 Navigate to the client directory and rebuild the Vue.js application using pnpm:
 
 ```sh
-cd ../client
+cd client
 pnpm install
 pnpm run build
 ```
 
 ### 3. Build the Go Application
 
-Rebuild the Go application and place the binary in the `Apps` folder:
+Rebuild the Go application and place the binary in the desired directory:
 
 ```sh
-cd server
+cd ../server
 go build -o ~/Apps/iot_dashboard ./cmd
 ```
 

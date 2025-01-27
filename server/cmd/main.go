@@ -17,6 +17,10 @@ func main() {
 		fs.ServeHTTP(w, r)
 	}))
 
+	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello, World!"))
+	})
+
 	println(`
     Server started at http://localhost:9090 📡
     `)
