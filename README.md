@@ -11,6 +11,8 @@ Intended use case is an ARM based RapsberryPi.
 
 - Raspberry Pi
 - Go programming language installed
+- Node.js installed
+- PNPM installed
 - Git installed
 
 ## Setup
