@@ -1,22 +1,35 @@
-// Main file for the server
 package main
 
 import (
+	"bytes"
 	"embed"
+	"encoding/json"
+	"fmt"
 	"io/fs"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
+	"sync"
+
+	"github.com/joho/godotenv"
 )
 
 //go:embed internal/static/dist/*
 var frontend embed.FS
 
+var (
+	token     string
+	tokenLock sync.Mutex
+)
+
 func main() {
-	// Create a file system from the embedded files
+
 	staticFiles, err := fs.Sub(frontend, "internal/static/dist")
 	if err != nil {
 		panic(err)
 	}
+
 	fs := http.FileServer(http.FS(staticFiles))
 
 	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -49,8 +62,90 @@ func main() {
 		w.Write(body)
 	})
 
+	http.HandleFunc("/api/v1/homebridge", func(w http.ResponseWriter, r *http.Request) {
+		// TODO make separte function for this
+		tokenLock.Lock()
+		if token == "" {
+			fmt.Println("Token is empty")
+			tokenLock.Unlock()
+			err := homebridgeLogin()
+			if err != nil {
+				http.Error(w, "Failed to login to Homebridge API", http.StatusInternalServerError)
+				return
+			}
+			tokenLock.Lock()
+		}
+		tokenLock.Unlock()
+		print(token)
+		req, err := http.NewRequest("GET", "http://localhost:8581/api/accessories", nil)
+		if err != nil {
+			http.Error(w, "Failed to create request", http.StatusInternalServerError)
+			return
+		}
+		req.Header.Set("Authorization", "Bearer "+token)
+
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			http.Error(w, "Failed to connect to Homebridge API", http.StatusInternalServerError)
+			return
+		}
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			http.Error(w, "Failed to read response body", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(body)
+	})
+
 	println(`
     Server started at http://localhost:9090 📡
     `)
 	http.ListenAndServe(":9090", nil)
+}
+
+func homebridgeLogin() error {
+	// TODO: move this to a separate function
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file: %s", err)
+	}
+	username := os.Getenv("HOME_BRIDGE_USERNAME")
+	password := os.Getenv("HOME_BRIDGE_PASSWORD")
+	data := map[string]string{
+		"username": username,
+		"password": password,
+		"otp":      "",
+	}
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.Post("http://localhost:8581/api/auth/login", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+	fmt.Println("Response: ", resp)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to login, status code: %d", resp.StatusCode)
+	}
+
+	var result map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return err
+	}
+
+	tokenLock.Lock()
+	token = result["token"].(string)
+	tokenLock.Unlock()
+
+	return nil
 }
