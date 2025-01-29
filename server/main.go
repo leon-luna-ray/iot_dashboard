@@ -23,6 +23,26 @@ var (
 	tokenLock sync.Mutex
 )
 
+type Config struct {
+	ENV         string
+	HB_USERNAME string
+	HB_PASSWORD string
+}
+
+var config Config
+
+func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+	config = Config{
+		HB_USERNAME: os.Getenv("HB_USERNAME"),
+		HB_PASSWORD: os.Getenv("HB_PASSWORD"),
+	}
+}
+
 func main() {
 
 	staticFiles, err := fs.Sub(frontend, "internal/static/dist")
@@ -114,11 +134,10 @@ func homebridgeLogin() error {
 	if err != nil {
 		log.Fatalf("Error loading .env file: %s", err)
 	}
-	username := os.Getenv("HOME_BRIDGE_USERNAME")
-	password := os.Getenv("HOME_BRIDGE_PASSWORD")
+
 	data := map[string]string{
-		"username": username,
-		"password": password,
+		"username": config.HB_USERNAME,
+		"password": config.HB_PASSWORD,
 		"otp":      "",
 	}
 	jsonData, err := json.Marshal(data)
@@ -126,7 +145,7 @@ func homebridgeLogin() error {
 		return err
 	}
 
-	resp, err := http.Post("http://localhost:8581/api/auth/login", "application/json", bytes.NewBuffer(jsonData))
+	resp, err := http.Post("http://192.168.50.2:8581/api/auth/login", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return err
 	}
