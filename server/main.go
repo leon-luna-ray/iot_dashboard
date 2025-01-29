@@ -19,8 +19,7 @@ import (
 var frontend embed.FS
 
 var (
-	token     string
-	tokenLock sync.Mutex
+	homebridgeClient *HomebridgeClient
 )
 
 type Config struct {
@@ -41,10 +40,12 @@ func init() {
 		HB_USERNAME: os.Getenv("HB_USERNAME"),
 		HB_PASSWORD: os.Getenv("HB_PASSWORD"),
 	}
+
+	// Initialize the Homebridge client
+	homebridgeClient = NewHomebridgeClient("http://192.168.50.2:8581", config.HB_USERNAME, config.HB_PASSWORD)
 }
 
 func main() {
-
 	staticFiles, err := fs.Sub(frontend, "internal/static/dist")
 	if err != nil {
 		panic(err)
@@ -83,38 +84,9 @@ func main() {
 	})
 
 	http.HandleFunc("/api/v1/homebridge", func(w http.ResponseWriter, r *http.Request) {
-		// TODO make separte function for this
-		tokenLock.Lock()
-		if token == "" {
-			fmt.Println("Token is empty")
-			tokenLock.Unlock()
-			err := homebridgeLogin()
-			if err != nil {
-				http.Error(w, "Failed to login to Homebridge API", http.StatusInternalServerError)
-				return
-			}
-			tokenLock.Lock()
-		}
-		tokenLock.Unlock()
-		print(token)
-		req, err := http.NewRequest("GET", "http://localhost:8581/api/accessories", nil)
+		body, err := homebridgeClient.GetAccessories()
 		if err != nil {
-			http.Error(w, "Failed to create request", http.StatusInternalServerError)
-			return
-		}
-		req.Header.Set("Authorization", "Bearer "+token)
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			http.Error(w, "Failed to connect to Homebridge API", http.StatusInternalServerError)
-			return
-		}
-		defer resp.Body.Close()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			http.Error(w, "Failed to read response body", http.StatusInternalServerError)
+			http.Error(w, "Failed to fetch accessories: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -128,16 +100,28 @@ func main() {
 	http.ListenAndServe(":9090", nil)
 }
 
-func homebridgeLogin() error {
-	// TODO: move this to a separate function
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file: %s", err)
-	}
+type HomebridgeClient struct {
+	BaseURL    string
+	Username   string
+	Password   string
+	Token      string
+	TokenLock  sync.Mutex
+	HTTPClient *http.Client
+}
 
+func NewHomebridgeClient(baseURL, username, password string) *HomebridgeClient {
+	return &HomebridgeClient{
+		BaseURL:    baseURL,
+		Username:   username,
+		Password:   password,
+		HTTPClient: &http.Client{},
+	}
+}
+
+func (c *HomebridgeClient) Login() error {
 	data := map[string]string{
-		"username": config.HB_USERNAME,
-		"password": config.HB_PASSWORD,
+		"username": c.Username,
+		"password": c.Password,
 		"otp":      "",
 	}
 	jsonData, err := json.Marshal(data)
@@ -145,11 +129,10 @@ func homebridgeLogin() error {
 		return err
 	}
 
-	resp, err := http.Post("http://192.168.50.2:8581/api/auth/login", "application/json", bytes.NewBuffer(jsonData))
+	resp, err := c.HTTPClient.Post(c.BaseURL+"/api/auth/login", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return err
 	}
-	fmt.Println("Response: ", resp)
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -162,9 +145,36 @@ func homebridgeLogin() error {
 		return err
 	}
 
-	tokenLock.Lock()
-	token = result["token"].(string)
-	tokenLock.Unlock()
+	c.TokenLock.Lock()
+	c.Token = result["token"].(string)
+	c.TokenLock.Unlock()
 
 	return nil
+}
+
+func (c *HomebridgeClient) GetAccessories() ([]byte, error) {
+	if c.Token == "" {
+		if err := c.Login(); err != nil {
+			return nil, err
+		}
+	}
+
+	req, err := http.NewRequest("GET", c.BaseURL+"/api/accessories", nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+c.Token)
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
 }
