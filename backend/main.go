@@ -1,8 +1,8 @@
 package main
 
 import (
-	"internal/config"
-	"internal/server"
+	"iot_dashboard/internal/config"
+	"iot_dashboard/internal/server"
 	"log"
 )
 
