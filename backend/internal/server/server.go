@@ -11,7 +11,7 @@ import (
 
 func Start(cfg *config.Config) error {
 	// Initialize the Homebridge client
-	// homebridgeClient := homebridge.NewHomebridgeClient("http://192.168.50.2:8581", cfg.HBUsername, cfg.HBPassword)
+	// homebridgeClient := homebridge.NewHomebridgeClient("http://localhost:8581", cfg.HBUsername, cfg.HBPassword)
 
 	// Set up routes
 	router := api.TestRouter()
