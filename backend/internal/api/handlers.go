@@ -10,7 +10,7 @@ func handleHello(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlePosts(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Get("https://jsonplaceholder.typicode.com/posts")
+	resp, err := http.Get("https://dummyjson.com/posts?limit=10")
 	if err != nil {
 		http.Error(w, "Failed to fetch posts", http.StatusInternalServerError)
 		return
