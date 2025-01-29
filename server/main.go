@@ -23,9 +23,10 @@ var (
 )
 
 type Config struct {
-	ENV         string
-	HB_USERNAME string
-	HB_PASSWORD string
+	ENV             string
+	HB_USERNAME     string
+	HB_PASSWORD     string
+	HB_BASE_API_URL string
 }
 
 var config Config
@@ -37,12 +38,13 @@ func init() {
 	}
 
 	config = Config{
-		HB_USERNAME: os.Getenv("HB_USERNAME"),
-		HB_PASSWORD: os.Getenv("HB_PASSWORD"),
+		HB_USERNAME:     os.Getenv("HB_USERNAME"),
+		HB_PASSWORD:     os.Getenv("HB_PASSWORD"),
+		HB_BASE_API_URL: os.Getenv("HB_BASE_API_URL"),
 	}
 
 	// Initialize the Homebridge client
-	homebridgeClient = NewHomebridgeClient("http://192.168.50.2:8581", config.HB_USERNAME, config.HB_PASSWORD)
+	homebridgeClient = NewHomebridgeClient(config.HB_BASE_API_URL, config.HB_USERNAME, config.HB_PASSWORD)
 }
 
 func main() {
