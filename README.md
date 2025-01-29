@@ -23,7 +23,7 @@ Clone the repository to your Raspberry Pi:
 
 ```sh
 git clone https://github.com/leon-luna-ray/iot_dashboard.git
-cd iot_dashboard/server
+cd iot_dashboard/backend
 ```
 
 ### 2. Initialize Go Modules (if needed)
@@ -34,17 +34,17 @@ If project does not already have a `go.mod` file, initialize Go modules:
 go mod init github.com/leon-luna-ray/iot_dashboard
 ```
 
-### 3. Build the frontend client
+### 3. Build the frontend
 If pnpm is not already installed, you can install it using npm:
 
 ```sh
 npm install -g pnpm
 ```
 
-Navigate to the client directory and build the Vue.js application using pnpm:
+Navigate to the frontend directory and build the Vue.js application using pnpm:
 
 ```sh
-cd client
+cd frontend
 pnpm install
 pnpm run build
 ```
@@ -116,12 +116,12 @@ Navigate to the project directory and pull the latest changes from the main bran
 cd ~/code/iot_dashboard
 git pull origin main
 ```
-### 2. Build the frontend client
+### 2. Build the frontend frontend
 
-Navigate to the client directory and rebuild the Vue.js application using pnpm:
+Navigate to the frontend directory and rebuild the Vue.js application using pnpm:
 
 ```sh
-cd client
+cd frontend
 pnpm install
 pnpm run build
 ```
@@ -131,7 +131,7 @@ pnpm run build
 Rebuild the Go application and place the binary in the desired directory:
 
 ```sh
-cd ../server
+cd ../backend
 go build -o ~/Apps/iot_dashboard ./cmd
 ```
 

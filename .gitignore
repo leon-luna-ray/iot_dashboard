@@ -98,4 +98,6 @@ vendor/
 
 dist/
 
-/server/iot_dashboard
+/backend/iot_dashboard
+
+.env
