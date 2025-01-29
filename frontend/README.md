@@ -1,4 +1,4 @@
-# IoT Dashboard Frontend Client
+# IoT Dashboard Frontend
 
 ## Project Setup
 

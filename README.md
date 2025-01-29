@@ -10,7 +10,7 @@ Intended use case is an ARM based RapsberryPi.
 ## Prerequisites
 
 - Raspberry Pi
-- Go programming language installed
+- Go installed
 - Node.js installed
 - Pnpm installed
 - Git installed
