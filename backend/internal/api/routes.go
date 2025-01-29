@@ -1,22 +1,29 @@
 package api
 
 import (
-	"embed"
-	// "iot_dashboard/internal/homebridge"
+	"io/fs"
+	"log"
 	"net/http"
 )
 
-// go:embed internal/static/dist/*
-var staticFiles embed.FS
+var staticFS fs.FS
+
+func SetStaticFS(embeddedFS fs.FS) {
+	staticFS = embeddedFS
+}
 
 func TestRouter() http.Handler {
 	mux := http.NewServeMux()
 
-	// Static files
-	fs := http.FileServer(http.FS(staticFiles))
+	htmlContent, err := fs.Sub(staticFS, "public/static/dist")
+
+	if err != nil {
+		log.Panic(err)
+	}
+	fs := http.FileServer(http.FS(htmlContent))
 	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
-			http.ServeFile(w, r, "iot_dashboard/internal/static/dist/index.html")
+			http.ServeFile(w, r, "public/static/dist/index.html")
 			return
 		}
 		fs.ServeHTTP(w, r)

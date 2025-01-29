@@ -1,12 +1,19 @@
 package main
 
 import (
+	"embed"
+	"iot_dashboard/internal/api"
 	"iot_dashboard/internal/config"
 	"iot_dashboard/internal/server"
 	"log"
 )
 
+//go:embed public/static/dist/*
+var staticFiles embed.FS
+
 func main() {
+	api.SetStaticFS(staticFiles)
+
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
