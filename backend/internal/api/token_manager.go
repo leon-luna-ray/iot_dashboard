@@ -44,13 +44,16 @@ func NewTokenManager() *TokenManager {
 
 func (tm *TokenManager) fetchToken() error {
 	client := &http.Client{Timeout: 10 * time.Second}
-
+	fmt.Println("🪙 Fetching new token...")
 	// Create basic auth header
 	auth := fmt.Sprintf("%s:%s", tm.appKey, tm.appSecret)
+	fmt.Println("Auth:", auth)
 	basicAuth := base64.StdEncoding.EncodeToString([]byte(auth))
 
 	req, err := http.NewRequest("POST", tm.authURL, nil)
+	fmt.Println("Request URL:", tm.authURL)
 	if err != nil {
+		fmt.Println("Request err:", err)
 		return err
 	}
 
@@ -63,6 +66,7 @@ func (tm *TokenManager) fetchToken() error {
 	}
 
 	resp, err := client.Do(req)
+	fmt.Println("Response:", resp)
 	if err != nil {
 		return err
 	}

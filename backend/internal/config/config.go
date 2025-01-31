@@ -8,9 +8,9 @@ import (
 )
 
 type Config struct {
-	HBUsername  string
-	HBPassword  string
-	Port        string
+	Port string
+	// HBUsername  string
+	// HBPassword  string
 	QPAppKey    string
 	QPAppSecret string
 	QPAuthBase  string
@@ -23,9 +23,9 @@ func LoadConfig() (*Config, error) {
 	}
 
 	return &Config{
-		HBUsername:  os.Getenv("HB_USERNAME"),
-		HBPassword:  os.Getenv("HB_PASSWORD"),
-		Port:        "9090",
+		Port: "9090",
+		// HBUsername:  os.Getenv("HB_USERNAME"),
+		// HBPassword:  os.Getenv("HB_PASSWORD"),
 		QPAppKey:    os.Getenv("QP_APP_KEY"),
 		QPAppSecret: os.Getenv("QP_APP_SECRET"),
 		QPAuthBase:  os.Getenv("QP_AUTH_API_BASE"),
