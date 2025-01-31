@@ -1,10 +1,10 @@
 package api
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -17,7 +17,7 @@ import (
 type TokenManager struct {
 	token     string
 	expiry    time.Time
-	mu        sync.Mutex
+	mu        sync.RWMutex
 	appKey    string
 	appSecret string
 	authURL   string
@@ -45,33 +45,29 @@ func NewTokenManager() *TokenManager {
 }
 
 func (tm *TokenManager) fetchToken() error {
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{}
 
-	// Auth
-	auth := fmt.Sprintf("%s:%s", tm.appKey, tm.appSecret)
-	basicAuth := base64.StdEncoding.EncodeToString([]byte(auth))
-
-	// Create request
 	formData := url.Values{}
 	formData.Set("grant_type", "client_credentials")
 	formData.Set("scope", "device_full_access")
 
+	// Create request
 	req, err := http.NewRequest("POST", tm.authURL, strings.NewReader(formData.Encode()))
 	if err != nil {
-		fmt.Println("Request err:", err)
 		return err
 	}
+	req.SetBasicAuth(tm.appKey, tm.appSecret)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Authorization", "Basic "+basicAuth)
 
 	// Send request
 	resp, err := client.Do(req)
-	fmt.Println("Response:", resp)
 	if err != nil {
-		fmt.Println("Error:", err)
 		return err
 	}
 	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	fmt.Println("Response body:", string(body))
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to get token: status %d", resp.StatusCode)
@@ -83,27 +79,45 @@ func (tm *TokenManager) fetchToken() error {
 		ExpiresIn   int    `json:"expires_in"`
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	if err := json.Unmarshal(body, &result); err != nil {
 		return err
 	}
 
+	fmt.Println("Result:", result)
+
+	// Left off: Possible deadlock here
+	fmt.Println("Attempting to lock mutex")
 	tm.mu.Lock()
-	defer tm.mu.Unlock()
+	fmt.Println("Mutex locked")
+	defer func() {
+		fmt.Println("Unlocking mutex")
+		tm.mu.Unlock()
+	}()
+
 	tm.token = result.AccessToken
 	tm.expiry = time.Now().Add(time.Duration(result.ExpiresIn) * time.Second)
+
+	fmt.Println("Token:", tm.token)
+	fmt.Println("🍒")
+	fmt.Println("Expiry:", tm.expiry)
 
 	return nil
 }
 
 func (tm *TokenManager) GetToken() (string, error) {
-	tm.mu.Lock()
-	defer tm.mu.Unlock()
+	tm.mu.RLock()
+	defer tm.mu.RUnlock()
 
 	// Refresh token if expired or about to expire (within 30 seconds)
 	if time.Now().Add(30 * time.Second).After(tm.expiry) {
+		tm.mu.RUnlock()
+		tm.mu.Lock()
+		defer tm.mu.Unlock()
 		if err := tm.fetchToken(); err != nil {
 			return "", fmt.Errorf("failed to refresh token: %v", err)
 		}
+		tm.mu.RLock()
+		defer tm.mu.RUnlock()
 	}
 
 	if tm.token == "" {

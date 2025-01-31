@@ -35,6 +35,7 @@ func handlePosts(w http.ResponseWriter, r *http.Request) {
 func handleSensors(w http.ResponseWriter, r *http.Request) {
 	tm := NewTokenManager()
 	token, err := tm.GetToken()
+	fmt.Println("Token:", token)
 
 	if err != nil {
 		http.Error(w, "Failed to get access token", http.StatusInternalServerError)
@@ -57,41 +58,32 @@ func handleSensors(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// Set headers
 	req.Header.Set("Authorization", "Bearer "+token)
 
-	// Make the HTTP request
+	// Send request
 	client := &http.Client{}
 	resp, err := client.Do(req)
+	fmt.Printf("Response: %v\n", resp)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
 
-	// Handle non-200 responses
-	if resp.StatusCode != http.StatusOK {
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			http.Error(w, "Failed to read error response", http.StatusInternalServerError)
-			return
-		}
-		http.Error(w, string(body), resp.StatusCode)
+	// Read the entire response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "Failed to read API response", http.StatusInternalServerError)
 		return
 	}
 
-	// Copy headers from response
-	for k, v := range resp.Header {
-		w.Header()[k] = v
-	}
+	// Debug: Log the response body
+	log.Printf("API Response Body: %s", body)
 
-	// Copy status code and body
+	// Set headers and write response
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(resp.StatusCode)
-	_, err = io.Copy(w, resp.Body)
-	if err != nil {
-		log.Printf("Failed to write response: %v", err)
-	}
+	w.Write(body)
 }
 
 // func handleHomebridge(w http.ResponseWriter, r *http.Request, client *HomebridgeClient) {
