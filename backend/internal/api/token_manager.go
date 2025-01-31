@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -50,20 +52,34 @@ func (tm *TokenManager) fetchToken() error {
 	fmt.Println("Auth:", auth)
 	basicAuth := base64.StdEncoding.EncodeToString([]byte(auth))
 
-	req, err := http.NewRequest("POST", tm.authURL, nil)
-	fmt.Println("Request URL:", tm.authURL)
+	// req, err := http.NewRequest("POST", tm.authURL, nil)
+	// fmt.Println("Request URL:", tm.authURL)
+	// if err != nil {
+	// 	fmt.Println("Request err:", err)
+	// 	return err
+	// }
+
+	// Set headers and form data
+	// req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	// req.Header.Set("Authorization", "Basic "+basicAuth)
+	// req.Form = map[string][]string{
+	// 	"grant_type": {"client_credentials"},
+	// 	"scope":      {"device_full_access"},
+	// }
+	// Replace the existing form setup with encoded body
+	formData := url.Values{}
+	formData.Set("grant_type", "client_credentials")
+	formData.Set("scope", "device_full_access")
+
+	req, err := http.NewRequest("POST", tm.authURL, strings.NewReader(formData.Encode()))
 	if err != nil {
 		fmt.Println("Request err:", err)
 		return err
 	}
 
-	// Set headers and form data
+	// Set headers
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Basic "+basicAuth)
-	req.Form = map[string][]string{
-		"grant_type": {"client_credentials"},
-		"scope":      {"device_full_access"},
-	}
 
 	resp, err := client.Do(req)
 	fmt.Println("Response:", resp)
