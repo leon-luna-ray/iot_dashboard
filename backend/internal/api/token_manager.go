@@ -46,27 +46,12 @@ func NewTokenManager() *TokenManager {
 
 func (tm *TokenManager) fetchToken() error {
 	client := &http.Client{Timeout: 10 * time.Second}
-	fmt.Println("🪙 Fetching new token...")
-	// Create basic auth header
+
+	// Auth
 	auth := fmt.Sprintf("%s:%s", tm.appKey, tm.appSecret)
-	fmt.Println("Auth:", auth)
 	basicAuth := base64.StdEncoding.EncodeToString([]byte(auth))
 
-	// req, err := http.NewRequest("POST", tm.authURL, nil)
-	// fmt.Println("Request URL:", tm.authURL)
-	// if err != nil {
-	// 	fmt.Println("Request err:", err)
-	// 	return err
-	// }
-
-	// Set headers and form data
-	// req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	// req.Header.Set("Authorization", "Basic "+basicAuth)
-	// req.Form = map[string][]string{
-	// 	"grant_type": {"client_credentials"},
-	// 	"scope":      {"device_full_access"},
-	// }
-	// Replace the existing form setup with encoded body
+	// Create request
 	formData := url.Values{}
 	formData.Set("grant_type", "client_credentials")
 	formData.Set("scope", "device_full_access")
@@ -76,14 +61,14 @@ func (tm *TokenManager) fetchToken() error {
 		fmt.Println("Request err:", err)
 		return err
 	}
-
-	// Set headers
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", "Basic "+basicAuth)
 
+	// Send request
 	resp, err := client.Do(req)
 	fmt.Println("Response:", resp)
 	if err != nil {
+		fmt.Println("Error:", err)
 		return err
 	}
 	defer resp.Body.Close()
@@ -92,7 +77,7 @@ func (tm *TokenManager) fetchToken() error {
 		return fmt.Errorf("failed to get token: status %d", resp.StatusCode)
 	}
 
-	// Parse response (simplified - you should create proper struct for JSON response)
+	// Parse response
 	var result struct {
 		AccessToken string `json:"access_token"`
 		ExpiresIn   int    `json:"expires_in"`
