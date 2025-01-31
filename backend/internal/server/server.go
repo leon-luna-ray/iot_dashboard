@@ -12,8 +12,9 @@ import (
 func Start(cfg *config.Config) error {
 	// homebridgeClient := homebridge.NewHomebridgeClient("http://localhost:8581", cfg.HBUsername, cfg.HBPassword)
 
-	router := api.TestRouter()
+	router := api.Router()
 
 	log.Printf("Server started at http://localhost:%s 📡\n", cfg.Port)
 	return http.ListenAndServe(":"+cfg.Port, router)
+	return nil
 }

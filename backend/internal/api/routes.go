@@ -12,7 +12,7 @@ func SetStaticFS(embeddedFS fs.FS) {
 	staticFS = embeddedFS
 }
 
-func TestRouter() http.Handler {
+func Router() http.Handler {
 	mux := http.NewServeMux()
 
 	htmlContent, err := fs.Sub(staticFS, "public/static/dist")
