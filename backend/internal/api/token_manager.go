@@ -86,13 +86,8 @@ func (tm *TokenManager) fetchToken() error {
 	fmt.Println("Result:", result)
 
 	// Left off: Possible deadlock here
-	fmt.Println("Attempting to lock mutex")
-	tm.mu.Lock()
-	fmt.Println("Mutex locked")
-	defer func() {
-		fmt.Println("Unlocking mutex")
-		tm.mu.Unlock()
-	}()
+	tm.token = result.AccessToken
+	tm.expiry = time.Now().Add(time.Duration(result.ExpiresIn) * time.Second)
 
 	tm.token = result.AccessToken
 	tm.expiry = time.Now().Add(time.Duration(result.ExpiresIn) * time.Second)
@@ -106,17 +101,14 @@ func (tm *TokenManager) fetchToken() error {
 
 func (tm *TokenManager) GetToken() (string, error) {
 	tm.mu.RLock()
-	defer tm.mu.RUnlock()
-
-	// Refresh token if expired or about to expire (within 30 seconds)
 	if time.Now().Add(30 * time.Second).After(tm.expiry) {
-		tm.mu.RUnlock()
+		tm.mu.RUnlock() // Release the read lock before acquiring the write lock
 		tm.mu.Lock()
 		defer tm.mu.Unlock()
 		if err := tm.fetchToken(); err != nil {
 			return "", fmt.Errorf("failed to refresh token: %v", err)
 		}
-		tm.mu.RLock()
+	} else {
 		defer tm.mu.RUnlock()
 	}
 
