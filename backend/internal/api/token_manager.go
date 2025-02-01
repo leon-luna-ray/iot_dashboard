@@ -68,10 +68,9 @@ func (tm *TokenManager) fetchToken() error {
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
-	fmt.Println("Response body:", string(body))
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to get token: status %d", resp.StatusCode)
+		return fmt.Errorf("🔴 failed to get token: status %d", resp.StatusCode)
 	}
 
 	// Parse response
@@ -100,7 +99,7 @@ func (tm *TokenManager) GetToken() (string, error) {
 		tm.mu.Lock()
 		defer tm.mu.Unlock()
 		if err := tm.fetchToken(); err != nil {
-			return "", fmt.Errorf("failed to refresh token: %v", err)
+			return "", fmt.Errorf("🔴 failed to refresh token: %v", err)
 		}
 	} else {
 		fmt.Println("🟢 Token is still valid")
