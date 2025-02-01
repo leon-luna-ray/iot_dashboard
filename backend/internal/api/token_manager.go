@@ -47,6 +47,7 @@ func NewTokenManager() *TokenManager {
 func (tm *TokenManager) fetchToken() error {
 	client := &http.Client{}
 
+	// Prepare form data
 	formData := url.Values{}
 	formData.Set("grant_type", "client_credentials")
 	formData.Set("scope", "device_full_access")
@@ -83,18 +84,10 @@ func (tm *TokenManager) fetchToken() error {
 		return err
 	}
 
-	fmt.Println("Result:", result)
-
-	// Left off: Possible deadlock here
 	tm.token = result.AccessToken
 	tm.expiry = time.Now().Add(time.Duration(result.ExpiresIn) * time.Second)
 
-	tm.token = result.AccessToken
-	tm.expiry = time.Now().Add(time.Duration(result.ExpiresIn) * time.Second)
-
-	fmt.Println("Token:", tm.token)
-	fmt.Println("🍒")
-	fmt.Println("Expiry:", tm.expiry)
+	fmt.Println("🪙 Token acquired:")
 
 	return nil
 }
@@ -102,6 +95,7 @@ func (tm *TokenManager) fetchToken() error {
 func (tm *TokenManager) GetToken() (string, error) {
 	tm.mu.RLock()
 	if time.Now().Add(30 * time.Second).After(tm.expiry) {
+		fmt.Println("🟡 Token expired, refreshing...")
 		tm.mu.RUnlock() // Release the read lock before acquiring the write lock
 		tm.mu.Lock()
 		defer tm.mu.Unlock()
@@ -109,6 +103,7 @@ func (tm *TokenManager) GetToken() (string, error) {
 			return "", fmt.Errorf("failed to refresh token: %v", err)
 		}
 	} else {
+		fmt.Println("🟢 Token is still valid")
 		defer tm.mu.RUnlock()
 	}
 
