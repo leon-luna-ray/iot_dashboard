@@ -1,2 +1,3 @@
-QP_APP_SECRET=xxxx
+QP_AUTH_API_BASE=https://oauth.cleargrass.com/oauth2
 QP_APP_KEY=xxxx
+QP_APP_SECRET=xxxx
