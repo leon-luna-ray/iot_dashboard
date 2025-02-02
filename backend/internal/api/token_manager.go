@@ -57,6 +57,7 @@ func (tm *TokenManager) fetchToken() error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(req)
 	req.SetBasicAuth(tm.appKey, tm.appSecret)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
