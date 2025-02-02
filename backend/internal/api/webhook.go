@@ -23,17 +23,20 @@ type WebhookRequest struct {
 }
 
 func handleWebhook(w http.ResponseWriter, r *http.Request) {
+	// Validate request method
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// Read request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Error reading body", http.StatusBadRequest)
 		return
 	}
 
+	// Unmarshal JSON
 	var req WebhookRequest
 	if err := json.Unmarshal(body, &req); err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
@@ -58,7 +61,7 @@ func handleWebhook(w http.ResponseWriter, r *http.Request) {
 	mac.Write([]byte(strconv.FormatInt(req.Signature.Timestamp, 10) + req.Signature.Token))
 	expectedSignature := hex.EncodeToString(mac.Sum(nil))
 
-	// 3. Compare signatures
+	// Compare signatures
 	if !hmac.Equal([]byte(expectedSignature), []byte(req.Signature.Signature)) {
 		http.Error(w, "Invalid signature", http.StatusUnauthorized)
 		return
