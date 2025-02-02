@@ -12,7 +12,7 @@ func SetStaticFS(embeddedFS fs.FS) {
 	staticFS = embeddedFS
 }
 
-func TestRouter() http.Handler {
+func Router() http.Handler {
 	mux := http.NewServeMux()
 
 	htmlContent, err := fs.Sub(staticFS, "public/static/dist")
@@ -32,9 +32,7 @@ func TestRouter() http.Handler {
 	// API routes
 	mux.HandleFunc("/api/v1/hello", handleHello)
 	mux.HandleFunc("/api/v1/posts", handlePosts)
-	// mux.HandleFunc("/api/v1/homebridge", func(w http.ResponseWriter, r *http.Request) {
-	// 	homebridge.handleHomebridge(w, r, homebridgeClient)
-	// })
+	mux.HandleFunc("/api/v1/sensors", handleSensors)
 
 	return mux
 }

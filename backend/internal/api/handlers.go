@@ -26,14 +26,3 @@ func handlePosts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(body)
 }
-
-// func handleHomebridge(w http.ResponseWriter, r *http.Request, client *HomebridgeClient) {
-// 	body, err := client.GetAccessories()
-// 	if err != nil {
-// 		http.Error(w, "Failed to fetch accessories: "+err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.Write(body)
-// }
