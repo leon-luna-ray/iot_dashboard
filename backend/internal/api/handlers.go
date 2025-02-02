@@ -35,17 +35,20 @@ func handlePosts(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
-// Device represents a single device from the API response
-type Device struct {
-	// Define fields based on the actual API response structure
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type DeviceInfo struct {
+	MAC       string `json:"mac"`
+	Name      string `json:"name"`
+	CreatedAt int64  `json:"created_at"`
+	// Add other fields from the "info" object as needed
 }
 
-// DevicesResponse represents the structure of the devices list API response
+type Device struct {
+	Info DeviceInfo `json:"info"`
+}
+
 type DevicesResponse struct {
-	Devices []Device `json:"devices"` // Adjust according to actual API structure
-	Count   int      `json:"count"`
+	Total   int      `json:"total"`   // Changed from "Count" to "Total"
+	Devices []Device `json:"devices"` // Now correctly nested
 }
 
 // BindRequest represents the request structure for device binding
@@ -78,11 +81,12 @@ func fetchDevices(tm *TokenManager, qpAPIBase string) ([]byte, int, error) {
 	}
 	defer resp.Body.Close()
 
+	fmt.Println("Response Status:", resp)
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, 0, err
 	}
-
+	fmt.Println("Response Body:", string(body))
 	return body, resp.StatusCode, nil
 }
 
@@ -142,6 +146,7 @@ func bindDevice() error {
 
 	return nil
 }
+
 func handleSensors(w http.ResponseWriter, r *http.Request) {
 	tm := NewTokenManager()
 	qpAPIBase := os.Getenv("QP_API_BASE")
@@ -150,87 +155,42 @@ func handleSensors(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Initial fetch of devices
+	// Fetch devices
 	devicesBody, statusCode, err := fetchDevices(tm, qpAPIBase)
 	if err != nil {
 		http.Error(w, "Failed to fetch devices: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// Parse the response to check device count
-	var devicesResp DevicesResponse
-	if err := json.Unmarshal(devicesBody, &devicesResp); err != nil {
+	var apiResponse DevicesResponse
+	if err := json.Unmarshal(devicesBody, &apiResponse); err != nil {
 		log.Printf("Failed to parse devices response: %v", err)
-	} else {
-		if devicesResp.Count == 0 || len(devicesResp.Devices) == 0 {
-			log.Println("No devices found. Attempting to bind device...")
-			if err := bindDevice(); err != nil {
-				log.Printf("Device binding failed: %v", err)
-			} else {
-				// Re-fetch devices after successful binding
-				devicesBody, statusCode, err = fetchDevices(tm, qpAPIBase)
-				if err != nil {
-					http.Error(w, "Failed to re-fetch devices: "+err.Error(), http.StatusInternalServerError)
-					return
-				}
-			}
+		http.Error(w, "Failed to parse devices response", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Println("Total devices:", apiResponse.Total)
+	fmt.Println("Devices array length:", len(apiResponse.Devices))
+
+	// If no devices are found, attempt to bind the device
+	// TODO Move to frontend as an api endpoint
+	if apiResponse.Total == 0 || len(apiResponse.Devices) == 0 {
+		log.Println("❓ No devices found. Attempting to bind device...")
+		if err := bindDevice(); err != nil {
+			log.Printf("Device binding failed: %v", err)
+			http.Error(w, "Device binding failed: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Re-fetch devices after successful binding
+		devicesBody, statusCode, err = fetchDevices(tm, qpAPIBase)
+		if err != nil {
+			http.Error(w, "Failed to re-fetch devices: "+err.Error(), http.StatusInternalServerError)
+			return
 		}
 	}
 
+	// Return the devices list
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(devicesBody)
 }
-
-// func handleSensors(w http.ResponseWriter, r *http.Request) {
-// 	tm := NewTokenManager()
-// 	token, err := tm.GetToken()
-
-// 	if err != nil {
-// 		http.Error(w, "Failed to get access token", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	qpAPIBase := os.Getenv("QP_API_BASE")
-// 	if qpAPIBase == "" {
-// 		http.Error(w, "QP_API_BASE not configured", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	// Create timestamp and URL
-// 	timestamp := time.Now().Unix()
-// 	url := fmt.Sprintf("%s/devices?timestamp=%d", qpAPIBase, timestamp)
-
-// 	// Create new request
-// 	req, err := http.NewRequest("GET", url, nil)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// 	req.Header.Set("Authorization", "Bearer "+token)
-
-// 	// Send request
-// 	client := &http.Client{}
-// 	resp, err := client.Do(req)
-// 	fmt.Printf("Response: %v\n", resp)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// 	defer resp.Body.Close()
-
-// 	// Read the entire response body
-// 	body, err := io.ReadAll(resp.Body)
-// 	if err != nil {
-// 		http.Error(w, "Failed to read API response", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	// Debug: Log the response body
-// 	log.Printf("API Response Body: %s", body)
-
-// 	// Set headers and write response
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.WriteHeader(resp.StatusCode)
-// 	w.Write(body)
-// }
