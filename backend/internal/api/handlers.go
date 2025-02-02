@@ -35,7 +35,6 @@ func handlePosts(w http.ResponseWriter, r *http.Request) {
 func handleSensors(w http.ResponseWriter, r *http.Request) {
 	tm := NewTokenManager()
 	token, err := tm.GetToken()
-	fmt.Println("Token:", token)
 
 	if err != nil {
 		http.Error(w, "Failed to get access token", http.StatusInternalServerError)
@@ -51,7 +50,7 @@ func handleSensors(w http.ResponseWriter, r *http.Request) {
 	// Create timestamp and URL
 	timestamp := time.Now().Unix()
 	url := fmt.Sprintf("%s/devices?timestamp=%d", qpAPIBase, timestamp)
-
+	fmt.Println("URL:", url)
 	// Create new request
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
