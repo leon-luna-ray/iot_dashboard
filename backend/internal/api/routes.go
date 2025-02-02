@@ -33,9 +33,6 @@ func Router() http.Handler {
 	mux.HandleFunc("/api/v1/hello", handleHello)
 	mux.HandleFunc("/api/v1/posts", handlePosts)
 	mux.HandleFunc("/api/v1/sensors", handleSensors)
-	// mux.HandleFunc("/api/v1/homebridge", func(w http.ResponseWriter, r *http.Request) {
-	// 	homebridge.handleHomebridge(w, r, homebridgeClient)
-	// })
 
 	return mux
 }
