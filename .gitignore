@@ -100,3 +100,4 @@ dist/
 
 /backend/iot_dashboard
 
+tmp/
