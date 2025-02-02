@@ -1,5 +1,5 @@
 name = "qingping-webhook"
-main = "src/worker.js"
+main = "src/index.js"
 compatibility_date = "2024-12-27"
 workers_dev = true
 preview_urls = false
