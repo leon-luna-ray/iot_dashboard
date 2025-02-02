@@ -17,6 +17,8 @@ export default {
     // Signature validation
     try {
       const timestamp = body.signature.timestamp;
+      console.log('Received timestamp:', timestamp);
+      
       // const token = body.signature.token;
       // const receivedSig = body.signature.signature;
     
