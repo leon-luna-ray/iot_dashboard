@@ -14,8 +14,7 @@ export default {
       } else if (path === '/api/data-push') {
         try {
           const body = await request.json();
-          
-          console.log('Received request body:', body);
+
           const timestamp = body.signature.timestamp;
           const token = body.signature.token;
           const receivedSig = body.signature.signature;
@@ -40,9 +39,6 @@ export default {
           const expectedSig = Array.from(new Uint8Array(signature))
             .map(b => b.toString(16).padStart(2, '0'))
             .join('');
-
-          console.log('Received signature:', receivedSig);
-          console.log('Expected signature:', expectedSig);
 
           if (receivedSig !== expectedSig) {
             console.log('Signature mismatch: Invalid request');
