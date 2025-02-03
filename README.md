@@ -49,7 +49,13 @@ pnpm install
 pnpm run build
 ```
 ### 4. Add enviorment variables (if needed)
-Add the needed enivorment variables for connecting to external APIs. Follow .env.example
+Add the needed enivorment variables for connecting to external APIs. Follow .env.example.
+
+If your connected to the Raspberrypi via SSH you can create the file inside the project directory using nano.
+
+```sh
+nano .env
+```
 
 ### 5. Build the Go Application
 
