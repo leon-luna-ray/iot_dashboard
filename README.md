@@ -48,8 +48,10 @@ cd frontend
 pnpm install
 pnpm run build
 ```
+### 4. Add enviorment variables (if needed)
+Add the needed enivorment variables for connecting to external APIs. Follow .env.example
 
-### 4. Build the Go Application
+### 5. Build the Go Application
 
 Build the Go application and place the binary in the desired directory:
 
@@ -57,7 +59,7 @@ Build the Go application and place the binary in the desired directory:
 go build -o ~/Apps/iot_dashboard ./cmd
 ```
 
-### 5. Create a Systemd Service
+### 6. Create a Systemd Service
 
 Create a systemd service file to run the application on boot:
 
@@ -85,7 +87,7 @@ WorkingDirectory=/home/user/Apps
 WantedBy=multi-user.target
 ```
 
-### 6. Reload Systemd and Enable the Service
+### 7. Reload Systemd and Enable the Service
 
 Reload systemd to recognize the new service:
 
@@ -94,7 +96,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable iot_dashboard.service
 ```
 
-### 7. Start the Service
+### 8. Start the Service
 
 Start the service:
 
