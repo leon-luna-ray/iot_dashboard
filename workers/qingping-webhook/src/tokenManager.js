@@ -11,7 +11,7 @@ export async function fetchToken(env) {
 
     const authString = btoa(`${appKey}:${appSecret}`);
     const formData = new URLSearchParams();
-    
+
     formData.append('grant_type', 'client_credentials');
     formData.append('scope', 'device_full_access');
 
@@ -30,11 +30,9 @@ export async function fetchToken(env) {
     }
 
     const result = await response.json();
-    
+
     tokenCache = {
         token: result.access_token,
         expiresAt: Date.now() + result.expires_in * 1000,
     };
-    console.log('Token fetched:', tokenCache);
-    return tokenCache.token;
 }

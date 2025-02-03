@@ -2,13 +2,15 @@ import { fetchToken, tokenCache } from './tokenManager.js';
 
 export default {
   async fetch(request, env) {
-    const testResponse = new Response(tokenCache, {status: 200});
+    const testResponse = new Response('hello world', { status: 200 });
     try {
       // Check token validity
       if (!tokenCache.token || tokenCache.expiresAt < Date.now()) {
-        await fetchToken(env); // Token refresh is now INSIDE the handler
+        console.log('🔴 Token expired or not present, fetching new token...');
+        await fetchToken(env);
       }
-
+      const token = tokenCache.token;
+      console.log('Token is valid:', token);
       // Route requests
       const url = new URL(request.url);
       const path = url.pathname;
