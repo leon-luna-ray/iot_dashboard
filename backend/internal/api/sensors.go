@@ -144,9 +144,6 @@ func handleSensors(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("Total devices:", apiResponse.Total)
-	fmt.Println("Devices array length:", len(apiResponse.Devices))
-
 	// If no devices are found, attempt to bind the device
 	// TODO Move to frontend as an api endpoint
 	if apiResponse.Total == 0 || len(apiResponse.Devices) == 0 {
