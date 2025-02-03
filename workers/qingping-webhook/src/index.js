@@ -15,6 +15,7 @@ export default {
         try {
           const body = await request.json();
           console.log('✅ Received body:', body);
+
           // const timestamp = body.signature.timestamp;
           // const token = body.signature.token;
           // const receivedSig = body.signature.signature;
