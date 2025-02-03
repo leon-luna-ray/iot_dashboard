@@ -19,11 +19,11 @@ Intended use case is an ARM based RapsberryPi.
 
 ### 1. Clone the Repository
 
-Clone the repository to your Raspberry Pi:
+Clone the repository to your Raspberry Pi and navigate to the project directory:
 
 ```sh
 git clone https://github.com/leon-luna-ray/iot_dashboard.git
-cd iot_dashboard/backend
+cd ./backend
 ```
 
 ### 2. Initialize Go Modules (if needed)
@@ -48,10 +48,11 @@ cd frontend
 pnpm install
 pnpm run build
 ```
+
 ### 4. Add enviorment variables (if needed)
 Add the needed enivorment variables for connecting to external APIs. Follow .env.example.
 
-If your connected to the Raspberrypi via SSH you can create the file inside the project directory using nano.
+If you're connected to the RaspberryPi via SSH you can create the file inside the project directory with nano.
 
 ```sh
 nano .env
@@ -62,7 +63,7 @@ nano .env
 Build the Go application and place the binary in the desired directory:
 
 ```sh
-go build -o ~/Apps/iot_dashboard ./cmd
+go build -o .
 ```
 
 ### 6. Create a Systemd Service
@@ -121,7 +122,7 @@ To update the application with the latest changes from the main branch, follow t
 Navigate to the project directory and pull the latest changes from the main branch:
 
 ```sh
-cd ~/code/iot_dashboard
+cd ./iot_dashboard
 git pull origin main
 ```
 ### 2. Build the frontend frontend
