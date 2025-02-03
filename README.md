@@ -132,7 +132,8 @@ Rebuild the Go application and place the binary in the desired directory:
 
 ```sh
 cd ../backend
-go build -o ~/Apps/iot_dashboard ./cmd
+go mod tidy
+go build -o .
 ```
 
 ### 4. Restart the Service
