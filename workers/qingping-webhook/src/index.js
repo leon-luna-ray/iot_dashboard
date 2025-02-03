@@ -1,35 +1,31 @@
-import { deviceData } from './deviceData.js';
-
 export default {
   async fetch(request, env) {
     try {
-      // Route requests
       const url = new URL(request.url);
       const path = url.pathname;
-
       if (path === '/api/data') {
-        return new Response(deviceData, {
+        // Return the saved device data
+        const timestamp = Math.floor(Date.now() / 1000); 
+        console.log('🟢 Current timestamp:', timestamp);
+        return new Response(JSON.stringify(timestamp || {}), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
         });
       } else if (path === '/api/data-push') {
-        // Signature validation
         try {
           const body = await request.json();
-
+          
           console.log('Received request body:', body);
-          // Signature validation
           const timestamp = body.signature.timestamp;
           const token = body.signature.token;
           const receivedSig = body.signature.signature;
-
-          // Validate timestamp (5-minute window)
+          
           const now = Math.floor(Date.now() / 1000);
           if (now - timestamp > 300) {
             console.log('Request expired: Timestamp too old');
             return new Response('Expired request', { status: 400 });
           }
-          // Generate signature
+          
           const encoder = new TextEncoder();
           const secret = await crypto.subtle.importKey(
             'raw',
@@ -47,14 +43,16 @@ export default {
 
           console.log('Received signature:', receivedSig);
           console.log('Expected signature:', expectedSig);
-          // Compare signatures
+
           if (receivedSig !== expectedSig) {
             console.log('Signature mismatch: Invalid request');
             return new Response('Invalid signature', { status: 401 });
           }
-          // Process payload
-          deviceData = body.payload;
-          console.log('Received device data:', deviceData);
+
+          // Save the payload to env
+          env.DEVICE_DATA = body.payload;
+          console.log('Received device data:', env.DEVICE_DATA);
+
           return new Response(JSON.stringify({ status: 'ok' }), {
             headers: { 'Content-Type': 'application/json' }
           });
