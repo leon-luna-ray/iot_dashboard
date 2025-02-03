@@ -1,6 +1,6 @@
 export default {
   async fetch(request, env) {
-    console.log('📥 Request received:', request);
+    console.log('📡 Request received');
     try {
       const url = new URL(request.url);
       const path = url.pathname;
@@ -54,8 +54,12 @@ export default {
           // env.DEVICE_DATA = body.payload;
           // console.log('Received device data:', env.DEVICE_DATA);
 
-          return new Response(JSON.stringify({ status: 'ok' }), {
-            headers: { 'Content-Type': 'application/json' }
+          return Promise.resolve()
+          .then(() => {
+            return new Response(JSON.stringify({ message: 'Data received successfully!' }), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            });
           });
         } catch (error) {
           console.error('Error processing request:', error);
