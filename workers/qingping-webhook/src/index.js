@@ -1,16 +1,20 @@
 export default {
   async fetch(request, env) {
+    console.log('📥 Request received:', request);
     try {
       const url = new URL(request.url);
       const path = url.pathname;
-      if (path === '/api/data') {
-        // Return the saved device data
-        const timestamp = Math.floor(Date.now() / 1000);
-
-        return new Response(JSON.stringify(timestamp || {}), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        });
+      if (path === '/api/data' && request.method === 'GET') {
+        const timestamp = new Date();
+        console.log(`📥 GET request received at ${timestamp}`);
+        
+        return Promise.resolve()
+          .then(() => {
+            return new Response(JSON.stringify({ message: 'Hello World!' }), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          });
       } else if (path === '/api/data-push') {
         try {
           const body = await request.json();
