@@ -17,6 +17,7 @@ export default {
           });
       } else if (path === '/api/data-push') {
         try {
+          console.log('📌 POST request received', request);
           const body = await request.json();
           console.log('✅ Received body:', body);
 
