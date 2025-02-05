@@ -137,21 +137,21 @@ func sensorsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO Move to frontend as an api endpoint
 	// If no devices are found, attempt to bind the device
-	if apiResponse.Total == 0 || len(apiResponse.Devices) == 0 {
-		log.Println("❓ No devices found. Attempting to bind device...")
-		if err := bindDevice(); err != nil {
-			log.Printf("❌ Device binding failed: %v", err)
-			http.Error(w, "❌ Device binding failed: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
+	// if apiResponse.Total == 0 || len(apiResponse.Devices) == 0 {
+	// 	log.Println("❓ No devices found. Attempting to bind device...")
+	// 	if err := bindDevice(); err != nil {
+	// 		log.Printf("❌ Device binding failed: %v", err)
+	// 		http.Error(w, "❌ Device binding failed: "+err.Error(), http.StatusInternalServerError)
+	// 		return
+	// 	}
 
-		// Re-fetch devices after successful binding
-		devicesBody, statusCode, err = fetchDevices(tm, qpAPIBase)
-		if err != nil {
-			http.Error(w, "❌ Failed to re-fetch devices: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
+	// 	// Re-fetch devices after successful binding
+	// 	devicesBody, statusCode, err = fetchDevices(tm, qpAPIBase)
+	// 	if err != nil {
+	// 		http.Error(w, "❌ Failed to re-fetch devices: "+err.Error(), http.StatusInternalServerError)
+	// 		return
+	// 	}
+	// }
 
 	// Filter devices with data
 	var devicesWithData []json.RawMessage

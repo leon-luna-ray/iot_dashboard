@@ -1,9 +1,13 @@
 <template>
-  <Header />
-  <main>
-    <HomeView />
-  </main>
-  <Footer />
+  <div class="flex flex-col justify-between h-screen">
+    <div>
+      <Header />
+      <main>
+        <HomeView />
+      </main>
+    </div>
+    <Footer />
+  </div>
 </template>
 
 <script setup>
