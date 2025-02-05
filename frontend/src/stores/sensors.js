@@ -1,22 +1,24 @@
 import axios from 'axios';
+
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 
 export const useSensorStore = defineStore('sensors', () => {
+    // State
     const data = ref(null);
-    const loading = ref(true);
+    const deviceInfo = ref(true);
 
-    const fetchData = async () => {
-        loading.value = true;
+    // Methods
+    const fetchData = async () => {        
         try {
-            const response = await axios.get('/sensors');
-            data.value = response.data;
-            console.log('Fetched data:', data.value);
+            const res = await axios.get('/sensors');
+            // Filter data for single device setup
+            data.value = res.data?.devices[0]?.data || null;
+            deviceInfo.value = res.data?.devices[0]?.info || null;
+
         } catch (error) {
             console.error('Error fetching data:', error);
-        } finally {
-            loading.value = false;
         }
     }
-    return { data, loading, fetchData };
+    return { data, deviceInfo, fetchData };
 });

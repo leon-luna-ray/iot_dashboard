@@ -3,20 +3,26 @@
         @apply bg-gray-100 text-gray-800 dark:bg-black/90 dark:text-gray-100;
     }
 
-    h1 {
+    h1, .h1 {
         @apply text-[4rem] font-bold;
     }
 
-    h2 {
+    h2, .h2 {
         @apply text-[3rem] font-bold;
     }
 
-    h3 {
+    h3, .h3 {
         @apply text-[2.25rem] font-bold;
     }
 
-    h4 {
+    h4, .h4 {
         @apply text-[1.5rem] font-bold;
+    }
+    h5, .h5 {
+        @apply text-[1.25rem] font-bold;
+    }
+    h6, .h6 {
+        @apply text-[1.125rem] font-bold;
     }
 
     .body-text-1 {

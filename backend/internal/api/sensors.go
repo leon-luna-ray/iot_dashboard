@@ -12,54 +12,19 @@ import (
 	"time"
 )
 
-type DeviceInfo struct {
-	MAC       string `json:"mac"`
-	Name      string `json:"name"`
-	CreatedAt int64  `json:"created_at"`
-}
-
-type DeviceData struct {
-	Timestamp struct {
-		Value int64 `json:"value"`
-	} `json:"timestamp"`
-	Battery struct {
-		Value int `json:"value"`
-	} `json:"battery"`
-	Temperature struct {
-		Value float64 `json:"value"`
-	} `json:"temperature"`
-	Humidity struct {
-		Value float64 `json:"value"`
-	} `json:"humidity"`
-	CO2 struct {
-		Value int `json:"value"`
-	} `json:"co2"`
-	PM25 struct {
-		Value int `json:"value"`
-	} `json:"pm25"`
-	PM10 struct {
-		Value int `json:"value"`
-	} `json:"pm10"`
-}
-
-type Device struct {
-	Info DeviceInfo  `json:"info"`
-	Data *DeviceData `json:"data,omitempty"`
-}
-
+// Structs
 type DevicesResponse struct {
-	Total   int      `json:"total"`
-	Devices []Device `json:"devices"`
+	Total   int               `json:"total"`
+	Devices []json.RawMessage `json:"devices"`
 }
 
-// BindRequest represents the request structure for device binding
 type BindRequest struct {
 	DeviceToken string `json:"device_token"`
 	ProductID   int    `json:"product_id"`
 	Timestamp   int64  `json:"timestamp"`
 }
 
-// fetchDevices handles the GET request to retrieve devices
+// Fetch device data from the API
 func fetchDevices(tm *TokenManager, qpAPIBase string) ([]byte, int, error) {
 	timestamp := time.Now().Unix()
 	url := fmt.Sprintf("%s/devices?timestamp=%d", qpAPIBase, timestamp)
@@ -82,7 +47,6 @@ func fetchDevices(tm *TokenManager, qpAPIBase string) ([]byte, int, error) {
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("Response Status:", resp)
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, 0, err
@@ -91,7 +55,7 @@ func fetchDevices(tm *TokenManager, qpAPIBase string) ([]byte, int, error) {
 	return body, resp.StatusCode, nil
 }
 
-// bindDevice handles the POST request to bind a device
+// Bind new device to the account
 func bindDevice() error {
 	deviceToken := os.Getenv("QP_DEVICE_TOKEN")
 	productIDStr := os.Getenv("QP_PRODUCT_ID")
@@ -123,16 +87,18 @@ func bindDevice() error {
 		return fmt.Errorf("failed to marshal bind request: %v", err)
 	}
 
-	// TODO update
-	url := "https://apis.cleargrass.com/v1/apis/devices"
+	// Create HTTP request
+	url := fmt.Sprintf("%s/devices", os.Getenv("QP_API_BASE"))
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return fmt.Errorf("failed to create bind request: %v", err)
 	}
 
+	// Set headers
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
+	// Send request
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -148,7 +114,7 @@ func bindDevice() error {
 	return nil
 }
 
-func handleSensors(w http.ResponseWriter, r *http.Request) {
+func sensorsHandler(w http.ResponseWriter, r *http.Request) {
 	tm := NewTokenManager()
 	qpAPIBase := os.Getenv("QP_API_BASE")
 	if qpAPIBase == "" {
@@ -187,34 +153,36 @@ func handleSensors(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var filteredDevices []Device
-	for _, d := range apiResponse.Devices {
-		if d.Data != nil {
-			filteredDevices = append(filteredDevices, d)
+	// Filter devices with data
+	var devicesWithData []json.RawMessage
+	for _, device := range apiResponse.Devices {
+		var obj map[string]interface{}
+		if err := json.Unmarshal(device, &obj); err != nil {
+			continue
+		}
+		if _, exists := obj["data"]; exists {
+			devicesWithData = append(devicesWithData, device)
 		}
 	}
 
-	// Create a new response with filtered devices
-	filteredResponse := DevicesResponse{
-		Total:   len(filteredDevices),
-		Devices: filteredDevices,
-	}
-
-	// Marshal the filtered response
-	filteredBody, err := json.Marshal(filteredResponse)
-	if err != nil {
-		log.Printf("❌ Failed to marshal filtered devices response: %v", err)
-		http.Error(w, "❌ Failed to prepare devices response", http.StatusInternalServerError)
+	if len(devicesWithData) == 0 {
+		http.Error(w, "No device with data found", http.StatusNotFound)
 		return
 	}
 
-	// Return the filtered response
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	w.Write(filteredBody)
+	// Wrap the response in a JSON struct
+	validResponse := struct {
+		Total   int               `json:"total"`
+		Devices []json.RawMessage `json:"devices"`
+	}{
+		Total:   len(devicesWithData),
+		Devices: devicesWithData,
+	}
 
-	// Return the devices list
+	// Send the response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	w.Write(devicesBody)
+	if err := json.NewEncoder(w).Encode(validResponse); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
 }
