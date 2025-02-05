@@ -1,7 +1,7 @@
 <template>
     <header>
         <div class="container py-[2rem]">
-            <h1 class="text-center">IOT Dashboard</h1>
+            <span>IOT Dashboard</span>
         </div>
     </header>
 </template>

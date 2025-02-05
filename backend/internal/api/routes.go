@@ -10,7 +10,7 @@ func Router() *http.ServeMux {
 	// API routes
 	router.HandleFunc("/api/v1/hello", handleHello)
 	router.HandleFunc("/api/v1/posts", handlePosts)
-	router.HandleFunc("/api/v1/sensors", handleSensors)
+	router.HandleFunc("/api/v1/sensors", sensorsHandler)
 
 	return router
 }
