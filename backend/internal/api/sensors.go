@@ -18,8 +18,33 @@ type DeviceInfo struct {
 	CreatedAt int64  `json:"created_at"`
 }
 
+type DeviceData struct {
+	Timestamp struct {
+		Value int64 `json:"value"`
+	} `json:"timestamp"`
+	Battery struct {
+		Value int `json:"value"`
+	} `json:"battery"`
+	Temperature struct {
+		Value float64 `json:"value"`
+	} `json:"temperature"`
+	Humidity struct {
+		Value float64 `json:"value"`
+	} `json:"humidity"`
+	CO2 struct {
+		Value int `json:"value"`
+	} `json:"co2"`
+	PM25 struct {
+		Value int `json:"value"`
+	} `json:"pm25"`
+	PM10 struct {
+		Value int `json:"value"`
+	} `json:"pm10"`
+}
+
 type Device struct {
-	Info DeviceInfo `json:"info"`
+	Info DeviceInfo  `json:"info"`
+	Data *DeviceData `json:"data,omitempty"`
 }
 
 type DevicesResponse struct {
@@ -144,23 +169,49 @@ func handleSensors(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If no devices are found, attempt to bind the device
 	// TODO Move to frontend as an api endpoint
+	// If no devices are found, attempt to bind the device
 	if apiResponse.Total == 0 || len(apiResponse.Devices) == 0 {
 		log.Println("❓ No devices found. Attempting to bind device...")
 		if err := bindDevice(); err != nil {
-			log.Printf("Device binding failed: %v", err)
-			http.Error(w, "Device binding failed: "+err.Error(), http.StatusInternalServerError)
+			log.Printf("❌ Device binding failed: %v", err)
+			http.Error(w, "❌ Device binding failed: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		// Re-fetch devices after successful binding
 		devicesBody, statusCode, err = fetchDevices(tm, qpAPIBase)
 		if err != nil {
-			http.Error(w, "Failed to re-fetch devices: "+err.Error(), http.StatusInternalServerError)
+			http.Error(w, "❌ Failed to re-fetch devices: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}
+
+	var filteredDevices []Device
+	for _, d := range apiResponse.Devices {
+		if d.Data != nil {
+			filteredDevices = append(filteredDevices, d)
+		}
+	}
+
+	// Create a new response with filtered devices
+	filteredResponse := DevicesResponse{
+		Total:   len(filteredDevices),
+		Devices: filteredDevices,
+	}
+
+	// Marshal the filtered response
+	filteredBody, err := json.Marshal(filteredResponse)
+	if err != nil {
+		log.Printf("❌ Failed to marshal filtered devices response: %v", err)
+		http.Error(w, "❌ Failed to prepare devices response", http.StatusInternalServerError)
+		return
+	}
+
+	// Return the filtered response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write(filteredBody)
 
 	// Return the devices list
 	w.Header().Set("Content-Type", "application/json")
