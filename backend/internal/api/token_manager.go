@@ -57,7 +57,7 @@ func (tm *TokenManager) fetchToken() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(req)
+	// Set headers
 	req.SetBasicAuth(tm.appKey, tm.appSecret)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -68,6 +68,7 @@ func (tm *TokenManager) fetchToken() error {
 	}
 	defer resp.Body.Close()
 
+	// Read response body
 	body, _ := io.ReadAll(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
