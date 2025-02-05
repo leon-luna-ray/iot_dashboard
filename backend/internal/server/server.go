@@ -7,7 +7,7 @@ import (
 )
 
 func Start(cfg *config.Config, router http.Handler) error {
-	log.Printf('hello world 🌐')
+	log.Printf("hello world 🌐")
 	log.Printf("Server started at http://localhost:%s 📡\n", cfg.Port)
 	log.Printf("QP_API_BASE: %s", cfg.QPAPIBase)
 	return http.ListenAndServe(":"+cfg.Port, router)
