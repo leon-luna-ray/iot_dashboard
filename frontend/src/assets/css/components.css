@@ -2,4 +2,8 @@
     .btn {
         @apply bg-blue-500 text-white font-bold py-2 px-4 rounded;
     }
+
+    .card {
+        @apply text-center border py-[1rem] rounded-sm flex flex-col gap-y-[1rem] items-center;
+    }
 }
