@@ -7,7 +7,6 @@ export const useSensorStore = defineStore('sensors', () => {
     // State
     const data = ref(null);
     const deviceInfo = ref(true);
-    // // TODO: set to local storage default to metric
     const units = ref('imperial');
 
     const temperature = computed(() => {
@@ -27,9 +26,9 @@ export const useSensorStore = defineStore('sensors', () => {
     });
 
     // Methods
-    const toggleUnits = async () => {
+    const toggleUnits = () => {
         units.value = units.value === 'imperial' ? 'metric' : 'imperial';
-        await setLocalStorage('units', units.value);
+        setLocalStorage('units', units.value);
     }
     const fetchData = async () => {
         try {

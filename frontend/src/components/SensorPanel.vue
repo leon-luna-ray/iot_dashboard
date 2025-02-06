@@ -29,10 +29,6 @@
                 <h2 class="h5 capitalize">pm10</h2>
                 <p class="h4">{{ sensors.data.pm10.value }}</p>
             </li>
-            <!-- <li v-for="item in gridItems" class="card" :key="item.key">
-                <h2 class="h4 capitalize">{{ item.key }}</h2>
-                <p class="h3">{{ item.value.value }}</p>
-            </li> -->
         </ul>
     </section>
 </template>
