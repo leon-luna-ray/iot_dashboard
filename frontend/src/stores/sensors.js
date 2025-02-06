@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { defineStore } from 'pinia';
+import { setLocalStorage } from '@/utils/localStorage.js';
 
 export const useSensorStore = defineStore('sensors', () => {
     // State
@@ -17,12 +18,18 @@ export const useSensorStore = defineStore('sensors', () => {
             return Math.round(data.value.temperature.value) + '°C';
         }
         return null;
-    })
+    });
+    const timestemp = computed(() => {
+        if (data.value?.timestamp?.value) {
+            return new Date(data.value.timestamp.value).toLocaleTimeString();
+        }
+        return null;
+    });
 
     // Methods
-    const toggleUnits = () => {
-        // Todo set to local storage
-        units.value = units.value === 'metric' ? 'imperial' : 'metric';
+    const toggleUnits = async () => {
+        units.value = units.value === 'imperial' ? 'metric' : 'imperial';
+        await setLocalStorage('units', units.value);
     }
     const fetchData = async () => {
         try {
@@ -35,5 +42,16 @@ export const useSensorStore = defineStore('sensors', () => {
             console.error('Error fetching data:', error);
         }
     }
-    return { data, deviceInfo, temperature, fetchData };
+
+    const setUnitsFromLocalStorage = () => {
+        const value = localStorage.getItem('units');
+        if (value) {
+            units.value = JSON.parse(value);
+        }
+    }
+
+    onMounted(() => {
+        setUnitsFromLocalStorage();
+    });
+    return { data, deviceInfo, temperature, timestemp, fetchData, toggleUnits };
 });
