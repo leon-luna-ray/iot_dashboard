@@ -63,7 +63,7 @@ nano .env
 Build the Go application and place the binary in the desired directory:
 
 ```sh
-go build -o .
+go build -o ./bin
 ```
 
 ### 6. Create a Systemd Service
@@ -142,7 +142,7 @@ Rebuild the Go application and place the binary in the desired directory:
 ```sh
 cd ../backend
 go mod tidy
-go build -o .
+go build -o ./bin
 ```
 
 ### 4. Restart the Service
